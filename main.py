@@ -3,6 +3,7 @@ import random
 import turtle
 
 raph = turtle.Turtle()
+mike = turtle.Turtle()
 raph.speed(0)
 
 def setupscreen(x, y):
@@ -64,46 +65,69 @@ wallheight=random.randrange(minwallheight, maxwallheight)
 print("WALLHEIGHT = " + str(wallheight))
 placewall(wallheight, walldistance)
 
-
 raph.penup()
 raph.goto(0,0)
 raph.pendown()
 
-# #startingspeed=int(input("what is the starting speed"))
-# #startingangle=int(input("what is the starting angle"))
-startingspeed=150
-startingangle=20
-x=0
-y=0
-
-vx = startingspeed*math.cos(math.radians(startingangle))
-vy = startingspeed*math.sin(math.radians(startingangle))
+startingspeed=100
+startingangle=45
 
 t=.01
 timeinair=0
 raph.shape("arrow")
-
+mike.penup()
 # this keeps the ball moving until it either hits the wall, the ground, or goes past the target distance
-while True:
-    print("x = " + str(int(x)) + ": walldisatnce = " + str(walldistance))
-    print("y = " + str(y) + ": wallheight = " + str(wallheight))
-
-    x=x+t*vx
-    y=y+t*vy
-    vy=vy-t*9.8
-
-    # this calculates the new x value
-    timeinair=timeinair+t
-    plot(x,y)
-
-    if ((targetdistance < 5) or (targetdistance>-5)) and y==0:
-        print("BOOM!");
-
-    if not ((y>0) and (x<targetdistance) and
-            not ((int(x)==walldistance) and (y<=wallheight))):
+#i = 0
+mike.goto(100, 800)
+done = False
+for startingangle in range(0, 90):
+    if done:
         break
+    for startingspeed in range(1, 200):
+        if done:
+            break
+        x = 0
+        y = 0
+        vx = startingspeed * math.cos(math.radians(startingangle))
+        vy = startingspeed * math.sin(math.radians(startingangle))
 
+        points = []
+        while x < 1500:
+            #print("x = " + str(int(x)) + ": walldisatnce = " + str(walldistance))
+            #print("y = " + str(y) + ": wallheight = " + str(wallheight))
+            x=x+t*vx
+            y=y+t*vy
+            vy=vy-t*9.8
+            # if (i%20) == 0:
+            #     mike.clear()
+            #     mike.write("vy: " + str(vy))
+            # i = i + 1
+            # this calculates the new x value
+            timeinair=timeinair+t
+            points.append((x, y))
+            #plot(x,y)
+
+            if y <= 0:  # it hit the ground
+                distanceToTarget = abs(int(x - targetdistance))
+                if distanceToTarget <= t*vx:
+                    print("BOOM!")
+                    print("Starting Speed = {}".format(startingspeed))
+                    print("Starting Angle = {}".format(startingangle))
+
+                    for point in points:
+                        plot(point[0], point[1])
+                    done = True
+                elif x < walldistance:
+                    print("Hit the ground")
+                break
+            if (x <= walldistance and walldistance - x < 5) and y<=wallheight:  #it got to the wall but isnt high enough
+                print("hit the wall")
+                break
+        if x >= 1500 or x > targetdistance:
+            print("shot too hard")
+            break
+print("Done")
 turtle.mainloop()
-print(str (timeinair))
+print(str(timeinair))
 
 
